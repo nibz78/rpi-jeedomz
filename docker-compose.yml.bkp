@@ -1,0 +1,68 @@
+version: '2'
+
+services:
+
+#MySQL data
+ mysql-data:
+  container_name: mysql-data
+  image: hypriot/rpi-busybox-httpd
+  restart: always
+  ports:
+   - 90:80
+  volumes:
+   - mysql:/var/lib/mysql
+
+#Jeedom data 
+ jeedom-data:
+  container_name: jeedom-data
+  image: hypriot/rpi-busybox-httpd
+  restart: always
+  ports:
+   - 91:80
+  volumes:
+   - jeedom:/var/www/html
+
+#Resilio Rsync data
+ resilio-data:
+  container_name: resilio-data
+  image: hypriot/rpi-busybox-httpd
+  restart: always
+  ports:
+   - 92:80
+  volumes:
+   - resilio:/opt/rslsync/etc
+
+#MySQL
+ mysql:
+  container_name: mysql
+  image: hypriot/rpi-mysql
+  restart: always
+  ports:
+   - 3306:3306
+  environment:
+   - MYSQL_ROOT_PASSWORD=?Nitram
+  volumes_from:
+   - mysql-data
+
+#Jeedom container
+ jeedomz:
+  container_name: jeedomz
+  image: nibz78/jeedomz
+  restart: always
+  ports:
+   - 80:80
+   - 443:443
+  links:
+   - mysql:mysql
+  mac_address: b8:27:eb:18:04:b8
+  volumes_from:
+    - jeedom-data
+
+volumes:
+ mysql:
+  external: true
+ jeedom:
+  external: true
+ resilio:
+  external: true
+ 
